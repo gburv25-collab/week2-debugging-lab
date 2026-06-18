@@ -4,67 +4,527 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Week 2 Python Debugging Lab</title>
+
 <style>
-:root{--bg:#f4f7fb;--card:#fff;--text:#1f2933;--muted:#52616b;--border:#d0d7de;--accent:#2f5d8c;--accent-light:#f3f6fb;--warn:#fff8e6;--warn-border:#e5c46b;--success:#eef6f0;--success-border:#3a7d44;--code-bg:#0f172a;--code-text:#e5e7eb;--button:#2f5d8c;--button-hover:#24496f}
-*{box-sizing:border-box} body{font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:var(--text);background:var(--bg);margin:0;padding:0} main{max-width:1180px;margin:0 auto;padding:24px}
-header{background:var(--accent-light);border-left:6px solid var(--accent);padding:20px 24px;border-radius:10px;margin-bottom:22px} h1,h2,h3{margin-top:0}
-.notice{background:var(--warn);border:1px solid var(--warn-border);padding:14px 18px;border-radius:8px;margin-bottom:22px}.success{background:var(--success);border-left:5px solid var(--success-border);padding:14px 18px;border-radius:8px;margin-bottom:22px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}@media(max-width:900px){.grid{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,.06);margin-bottom:18px}
-label{display:block;font-weight:bold;margin-bottom:6px}select,input,textarea{width:100%;font-family:Arial,Helvetica,sans-serif;font-size:15px;border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:12px;background:#fff;color:var(--text)}
-textarea.code{font-family:Consolas,Monaco,"Courier New",monospace;min-height:420px;background:var(--code-bg);color:var(--code-text);resize:vertical;line-height:1.45;tab-size:4}textarea.notes{min-height:120px;resize:vertical}
-.button-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}button{border:none;border-radius:8px;padding:10px 14px;background:var(--button);color:#fff;font-weight:bold;cursor:pointer;font-size:15px}button:hover{background:var(--button-hover)}button.secondary{background:#52616b}button.secondary:hover{background:#3f4b53}button.danger{background:#9f1239}button.danger:hover{background:#7f1230}
-pre.output{min-height:180px;white-space:pre-wrap;background:#111827;color:#f9fafb;border-radius:8px;padding:14px;overflow-x:auto;border:1px solid #334155;font-family:Consolas,Monaco,"Courier New",monospace}
-details{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:16px}summary{font-weight:bold;font-size:1.05rem;cursor:pointer}
-table{width:100%;border-collapse:collapse;margin-top:12px;margin-bottom:16px;background:#fff}th,td{border:1px solid var(--border);padding:8px;vertical-align:top;text-align:left}th{background:#f0f2f5}.small{font-size:.95rem;color:var(--muted)}
-.pill{display:inline-block;background:#e5edf6;color:#1f3f5b;padding:4px 8px;border-radius:999px;margin:3px 5px 3px 0;font-size:.9rem;font-weight:bold}.loader{display:none;margin-left:8px;font-weight:normal;color:var(--muted)}.footer{color:var(--muted);font-size:.9rem;margin-top:24px;text-align:center}
+:root {
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text: #1f2933;
+  --muted: #52616b;
+  --border: #d0d7de;
+  --accent: #2f5d8c;
+  --accent-light: #f3f6fb;
+  --warn: #fff8e6;
+  --warn-border: #e5c46b;
+  --success: #eef6f0;
+  --success-border: #3a7d44;
+  --code-bg: #0f172a;
+  --code-text: #e5e7eb;
+  --button: #2f5d8c;
+  --button-hover: #24496f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+header {
+  background: var(--accent-light);
+  border-left: 6px solid var(--accent);
+  padding: 20px 24px;
+  border-radius: 10px;
+  margin-bottom: 22px;
+}
+
+h1, h2, h3 {
+  margin-top: 0;
+}
+
+.notice {
+  background: var(--warn);
+  border: 1px solid var(--warn-border);
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 22px;
+}
+
+.success {
+  background: var(--success);
+  border-left: 5px solid var(--success-border);
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 22px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+select, textarea {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 12px;
+  background: #ffffff;
+  color: var(--text);
+}
+
+textarea.code {
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  min-height: 430px;
+  background: var(--code-bg);
+  color: var(--code-text);
+  resize: vertical;
+  line-height: 1.45;
+  tab-size: 4;
+}
+
+textarea.notes {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: var(--button);
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+button:hover {
+  background: var(--button-hover);
+}
+
+button.secondary {
+  background: #52616b;
+}
+
+button.secondary:hover {
+  background: #3f4b53;
+}
+
+button.danger {
+  background: #9f1239;
+}
+
+button.danger:hover {
+  background: #7f1230;
+}
+
+pre.output {
+  min-height: 180px;
+  white-space: pre-wrap;
+  background: #111827;
+  color: #f9fafb;
+  border-radius: 8px;
+  padding: 14px;
+  overflow-x: auto;
+  border: 1px solid #334155;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+}
+
+pre.example {
+  white-space: pre-wrap;
+  background: #f6f8fa;
+  color: #111827;
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  font-family: Consolas, Monaco, "Courier New", monospace;
+}
+
+details {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+summary {
+  font-weight: bold;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  margin-bottom: 16px;
+  background: #ffffff;
+}
+
+th, td {
+  border: 1px solid var(--border);
+  padding: 8px;
+  vertical-align: top;
+  text-align: left;
+}
+
+th {
+  background: #f0f2f5;
+}
+
+.small {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.pill {
+  display: inline-block;
+  background: #e5edf6;
+  color: #1f3f5b;
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin: 3px 5px 3px 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.loader {
+  display: none;
+  margin-left: 8px;
+  font-weight: normal;
+  color: var(--muted);
+}
+
+.footer {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 24px;
+  text-align: center;
+}
 </style>
 </head>
+
 <body>
 <main>
-<header><h1>Week 2 Python Debugging Lab</h1><p>This interactive lab supports Week 2: <strong>Debugging, Validation and Code Quality</strong>. Use it to run small Python examples, test inputs, identify defects, correct code and prepare Assignment 1 debugging evidence.</p></header>
-<section class="notice"><h2>Important Canvas note</h2><p>This page uses JavaScript and Pyodide to run Python in the browser. Some Canvas pages strip JavaScript if it is pasted directly into a page. The most reliable approach is to host this HTML file somewhere accessible, then embed it into Canvas using an iframe.</p><p class="small">The first run may take a little while because the Python runtime needs to load in the browser.</p></section>
-<section class="success"><h2>Learning focus</h2><p>Work through the tasks by selecting an activity, running the code, testing different inputs and recording what you find.</p><p><span class="pill">Syntax errors</span><span class="pill">Runtime errors</span><span class="pill">Logic errors</span><span class="pill">Validation</span><span class="pill">Debugging evidence</span><span class="pill">Software quality</span></p></section>
-<section class="grid">
-<div class="card"><h2>1. Choose an activity</h2><label for="activitySelect">Activity</label><select id="activitySelect"><option value="starter">Activity 1: Starter debugging challenge</option><option value="syntax">Activity 2: Syntax error</option><option value="runtime">Activity 3: Runtime error</option><option value="logic">Activity 4: Logic error</option><option value="validation">Activity 5: Validation challenge</option><option value="booking">Activity 6: Booking calculator debugging challenge</option><option value="corrected">Activity 7: Corrected booking calculator</option></select><div id="activityInfo" class="notice"></div><label for="stdinBox">Test input</label><textarea id="stdinBox" class="notes" placeholder="Enter test input here. Put each input on a new line if the program asks more than one question."></textarea><p class="small">Example: if the program asks for a customer name and number of tickets, enter the name on the first line and the ticket number on the second line.</p></div>
-<div class="card"><h2>2. Debugging evidence notes</h2><label for="defectNotes">Original defect</label><textarea id="defectNotes" class="notes" placeholder="What was wrong with the original code?"></textarea><label for="methodNotes">How I identified it / debugging method used</label><textarea id="methodNotes" class="notes" placeholder="Did you read an error message, inspect a variable, use print tracing, use a breakpoint, or test different inputs?"></textarea><label for="qualityNotes">Correction and quality improvement</label><textarea id="qualityNotes" class="notes" placeholder="What did you change? How did this improve reliability, usability, accuracy or maintainability?"></textarea><div class="button-row"><button class="secondary" onclick="copyEvidence()">Copy evidence note</button><button class="secondary" onclick="downloadEvidence()">Download evidence note</button></div></div>
+
+<header>
+  <h1>Week 2 Python Debugging Lab</h1>
+  <p>
+    This interactive lab supports Week 2: <strong>Debugging, Validation and Code Quality</strong>.
+    Use it to run small Python examples, test inputs, identify defects, correct code and prepare Assignment 1 debugging evidence.
+  </p>
+</header>
+
+<section class="success">
+  <h2>How to use this lab</h2>
+  <p>
+    Select an activity, read the task, run the code, test different inputs and record what you find.
+    The aim is not just to fix the code, but to explain what was wrong and how the correction improves quality.
+  </p>
+  <p>
+    <span class="pill">Syntax errors</span>
+    <span class="pill">Runtime errors</span>
+    <span class="pill">Logic errors</span>
+    <span class="pill">Validation</span>
+    <span class="pill">Debugging evidence</span>
+    <span class="pill">Software quality</span>
+  </p>
 </section>
-<section class="grid"><div class="card"><h2>3. Code editor</h2><div class="button-row"><button onclick="runPython()">Run code <span id="loader" class="loader">loading...</span></button><button class="secondary" onclick="resetCode()">Reset activity code</button><button class="secondary" onclick="copyCode()">Copy code</button><button class="danger" onclick="clearOutput()">Clear output</button></div><textarea id="codeEditor" class="code" spellcheck="false"></textarea></div><div class="card"><h2>4. Output</h2><pre id="output" class="output">Output will appear here.</pre><details><summary>Suggested test inputs</summary><div id="testInputs"></div></details><details><summary>Debugging prompts</summary><ul><li>What type of issue is present: syntax, runtime, logic or validation?</li><li>What line or value would you check first?</li><li>What evidence could you record for Assignment 1?</li><li>How does your correction improve software quality?</li></ul></details></div></section>
-<details><summary>Assignment 1 write-up structure</summary><p>Use this structure when turning your practical debugging work into a short explanation.</p><blockquote>The original code produced an unexpected result or error because...<br>I identified this by...<br>The debugging method I used was...<br>To correct the issue, I...<br>This improved the quality of the application because...</blockquote></details>
-<details><summary>Canvas iframe embed code</summary><p>After hosting this HTML file, replace <strong>PASTE-LINK-TO-THIS-HTML-FILE-HERE</strong> with the hosted file link.</p><pre class="output">&lt;iframe src="PASTE-LINK-TO-THIS-HTML-FILE-HERE" width="100%" height="900" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;</pre></details>
-<p class="footer">Programming Fundamentals · Week 2 · Debugging, Validation and Code Quality</p>
+
+<section class="notice">
+  <h2>Important note about program input</h2>
+  <p>
+    Some Python examples use <code>input()</code>. Because this page runs Python in the browser, you need to type the values for <code>input()</code> into the box labelled <strong>Program input for input() lines</strong>.
+  </p>
+  <p>
+    Use that box only when the code asks the user for input. If the program asks more than one question, put each answer on a new line.
+  </p>
+
+  <p><strong>Example:</strong> if the code asks for a customer name and then a number of tickets, enter:</p>
+
+  <pre class="example">Alex
+2</pre>
+</section>
+
+<section class="card">
+  <h2>1. Choose activity</h2>
+
+  <label for="activitySelect">Activity</label>
+  <select id="activitySelect">
+    <option value="starter">Activity 1: Starter debugging challenge</option>
+    <option value="syntax">Activity 2: Syntax error</option>
+    <option value="runtime">Activity 3: Runtime error</option>
+    <option value="logic">Activity 4: Logic error</option>
+    <option value="validation">Activity 5: Validation challenge</option>
+    <option value="booking">Activity 6: Booking calculator debugging challenge</option>
+    <option value="corrected">Activity 7: Corrected booking calculator</option>
+  </select>
+
+  <div id="activityInfo" class="notice"></div>
+</section>
+
+<section class="grid">
+
+  <div class="card">
+    <h2>2. Code editor</h2>
+
+    <div class="button-row">
+      <button onclick="runPython()">Run code <span id="loader" class="loader">loading...</span></button>
+      <button class="secondary" onclick="resetCode()">Reset activity code</button>
+      <button class="secondary" onclick="copyCode()">Copy code</button>
+      <button class="danger" onclick="clearOutput()">Clear output</button>
+    </div>
+
+    <textarea id="codeEditor" class="code" spellcheck="false"></textarea>
+  </div>
+
+  <div class="card">
+    <h2>3. Program input and output</h2>
+
+    <label for="stdinBox">Program input for <code>input()</code> lines</label>
+    <textarea id="stdinBox" class="notes" placeholder="Only use this box if the code contains input(). Put each answer on a new line."></textarea>
+
+    <p class="small">
+      Leave this box blank if the code does not contain <code>input()</code>.
+    </p>
+
+    <h3>Output</h3>
+    <pre id="output" class="output">Output will appear here.</pre>
+
+    <details>
+      <summary>Suggested inputs for this activity</summary>
+      <div id="testInputs"></div>
+    </details>
+
+    <details>
+      <summary>Debugging prompts</summary>
+      <ul>
+        <li>What type of issue is present: syntax, runtime, logic or validation?</li>
+        <li>What line or value would you check first?</li>
+        <li>What evidence could you record for Assignment 1?</li>
+        <li>How does your correction improve software quality?</li>
+      </ul>
+    </details>
+  </div>
+
+</section>
+
+<section class="card">
+  <h2>4. Debugging evidence notes</h2>
+  <p>
+    Use this section to prepare a short Assignment 1-style explanation of your debugging work.
+  </p>
+
+  <label for="defectNotes">Original defect</label>
+  <textarea id="defectNotes" class="notes" placeholder="What was wrong with the original code?"></textarea>
+
+  <label for="methodNotes">How I identified it / debugging method used</label>
+  <textarea id="methodNotes" class="notes" placeholder="Did you read an error message, inspect a variable, use print tracing, use a breakpoint, or test different inputs?"></textarea>
+
+  <label for="qualityNotes">Correction and quality improvement</label>
+  <textarea id="qualityNotes" class="notes" placeholder="What did you change? How did this improve reliability, usability, accuracy or maintainability?"></textarea>
+
+  <div class="button-row">
+    <button class="secondary" onclick="copyEvidence()">Copy evidence note</button>
+    <button class="secondary" onclick="downloadEvidence()">Download evidence note</button>
+  </div>
+</section>
+
+<details>
+  <summary>Assignment 1 write-up structure</summary>
+  <p>Use this structure when turning your practical debugging work into a short explanation.</p>
+  <blockquote>
+    The original code produced an unexpected result or error because...<br />
+    I identified this by...<br />
+    The debugging method I used was...<br />
+    To correct the issue, I...<br />
+    This improved the quality of the application because...
+  </blockquote>
+</details>
+
+<details>
+  <summary>Canvas iframe embed code</summary>
+  <p>
+    After hosting this HTML file, replace <strong>PASTE-LINK-TO-THIS-HTML-FILE-HERE</strong> with the hosted GitHub Pages link.
+  </p>
+  <pre class="output">&lt;iframe src="PASTE-LINK-TO-THIS-HTML-FILE-HERE" width="100%" height="900" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;</pre>
+</details>
+
+<p class="footer">
+  Programming Fundamentals · Week 2 · Debugging, Validation and Code Quality
+</p>
+
 </main>
+
 <script>
-const activities={
-starter:{info:`<h3>Activity 1: Starter debugging challenge</h3><p>This program is intended to calculate the total cost of tickets. Run it with different inputs and observe what happens.</p><p><strong>Focus:</strong> input types, validation, unexpected behaviour and output formatting.</p>`,input:"2",tests:`<table><tr><th>Input</th><th>What to observe</th></tr><tr><td><code>2</code></td><td>Does the program calculate £240 correctly?</td></tr><tr><td><code>five</code></td><td>Does the program handle text safely?</td></tr><tr><td>blank input</td><td>Does the program respond clearly?</td></tr><tr><td><code>0</code></td><td>Should zero tickets be allowed?</td></tr></table>`,code:`price = 120
+const activities = {
+  starter: {
+    info: `
+      <h3>Activity 1: Starter debugging challenge</h3>
+      <p>This program is intended to calculate the total cost of tickets. Run it with different inputs and observe what happens.</p>
+      <p><strong>Focus:</strong> input types, validation, unexpected behaviour and output formatting.</p>
+    `,
+    input: "2",
+    tests: `
+      <table>
+        <tr><th>Input</th><th>What to observe</th></tr>
+        <tr><td><code>2</code></td><td>Does the program calculate £240 correctly?</td></tr>
+        <tr><td><code>five</code></td><td>Does the program handle text safely?</td></tr>
+        <tr><td>blank input</td><td>Does the program respond clearly?</td></tr>
+        <tr><td><code>0</code></td><td>Should zero tickets be allowed?</td></tr>
+      </table>
+    `,
+    code: `price = 120
 tickets = input("Enter number of tickets: ")
 
 total = price * tickets
 
-print("Total cost: £" + total)`},
-syntax:{info:`<h3>Activity 2: Syntax error</h3><p>This code breaks Python syntax rules. Run it, read the error message and correct the missing punctuation.</p><p><strong>Focus:</strong> syntax errors, error messages and missing colons.</p>`,input:"",tests:`<p>No input needed. Run the code and read the error message.</p>`,code:`age = 18
+print("Total cost: £" + total)`
+  },
+
+  syntax: {
+    info: `
+      <h3>Activity 2: Syntax error</h3>
+      <p>This code breaks Python syntax rules. Run it, read the error message and correct the missing punctuation.</p>
+      <p><strong>Focus:</strong> syntax errors, error messages and missing colons.</p>
+    `,
+    input: "",
+    tests: `<p>No input is needed. Run the code and read the error message.</p>`,
+    code: `age = 18
 
 if age >= 18
-    print("Adult")`},
-runtime:{info:`<h3>Activity 3: Runtime error</h3><p>This program may work for some inputs but fail for others.</p><p><strong>Focus:</strong> division by zero, invalid number conversion and safer input handling.</p>`,input:"10",tests:`<table><tr><th>Input</th><th>What to observe</th></tr><tr><td><code>10</code></td><td>Expected output is 10.0.</td></tr><tr><td><code>0</code></td><td>Division by zero error.</td></tr><tr><td><code>five</code></td><td>Value conversion error.</td></tr></table>`,code:`number = int(input("Enter a number: "))
+    print("Adult")`
+  },
+
+  runtime: {
+    info: `
+      <h3>Activity 3: Runtime error</h3>
+      <p>This program may work for some inputs but fail for others.</p>
+      <p><strong>Focus:</strong> division by zero, invalid number conversion and safer input handling.</p>
+    `,
+    input: "10",
+    tests: `
+      <table>
+        <tr><th>Input</th><th>What to observe</th></tr>
+        <tr><td><code>10</code></td><td>Expected output is 10.0.</td></tr>
+        <tr><td><code>0</code></td><td>Division by zero error.</td></tr>
+        <tr><td><code>five</code></td><td>Value conversion error.</td></tr>
+      </table>
+    `,
+    code: `number = int(input("Enter a number: "))
 answer = 100 / number
 
-print(answer)`},
-logic:{info:`<h3>Activity 4: Logic error</h3><p>This program runs but gives the wrong result because the VAT calculation is incorrect.</p><p><strong>Focus:</strong> expected result, actual result and calculation accuracy.</p>`,input:"",tests:`<p>No input needed. Expected subtotal is 240, VAT should be 48, and total should be 288.</p>`,code:`price = 120
+print(answer)`
+  },
+
+  logic: {
+    info: `
+      <h3>Activity 4: Logic error</h3>
+      <p>This program runs but gives the wrong result because the VAT calculation is incorrect.</p>
+      <p><strong>Focus:</strong> expected result, actual result and calculation accuracy.</p>
+    `,
+    input: "",
+    tests: `<p>No input is needed. Expected subtotal is 240, VAT should be 48, and total should be 288.</p>`,
+    code: `price = 120
 tickets = 2
 
 vat = price * 20
 total = price * tickets + vat
 
-print(total)`},
-validation:{info:`<h3>Activity 5: Validation challenge</h3><p>This version checks whether the input contains digits before converting it into an integer.</p><p><strong>Focus:</strong> validation, reliability and usability.</p>`,input:"2",tests:`<table><tr><th>Input</th><th>What to observe</th></tr><tr><td><code>2</code></td><td>Input accepted.</td></tr><tr><td><code>five</code></td><td>Clear message asking for a whole number.</td></tr><tr><td><code>-1</code></td><td>This simple check does not accept negative numbers.</td></tr><tr><td><code>2.5</code></td><td>This simple check does not accept decimals.</td></tr></table>`,code:`ticket_input = input("Enter number of tickets: ")
+print(total)`
+  },
+
+  validation: {
+    info: `
+      <h3>Activity 5: Validation challenge</h3>
+      <p>This version checks whether the input contains digits before converting it into an integer.</p>
+      <p><strong>Focus:</strong> validation, reliability and usability.</p>
+    `,
+    input: "2",
+    tests: `
+      <table>
+        <tr><th>Input</th><th>What to observe</th></tr>
+        <tr><td><code>2</code></td><td>Input accepted.</td></tr>
+        <tr><td><code>five</code></td><td>Clear message asking for a whole number.</td></tr>
+        <tr><td><code>-1</code></td><td>This simple check does not accept negative numbers.</td></tr>
+        <tr><td><code>2.5</code></td><td>This simple check does not accept decimals.</td></tr>
+      </table>
+    `,
+    code: `ticket_input = input("Enter number of tickets: ")
 
 if ticket_input.isdigit():
     tickets = int(ticket_input)
     print("Tickets accepted")
 else:
-    print("Please enter a whole number.")`},
-booking:{info:`<h3>Activity 6: Booking calculator debugging challenge</h3><p>This program contains several issues. Identify as many as you can, then correct the code.</p><p><strong>Focus:</strong> type handling, validation, logic errors, output formatting and software quality.</p>`,input:"Alex\n2",tests:`<table><tr><th>Input</th><th>What to observe</th></tr><tr><td><code>Alex</code> then <code>2</code></td><td>Does the total calculate correctly?</td></tr><tr><td>blank name then <code>2</code></td><td>Should a blank customer name be accepted?</td></tr><tr><td><code>Alex</code> then <code>five</code></td><td>Does the program handle text safely?</td></tr><tr><td><code>Alex</code> then <code>0</code></td><td>Should zero tickets be accepted?</td></tr><tr><td><code>Alex</code> then <code>6</code></td><td>Does the discount calculation work?</td></tr></table>`,code:`# Booking Calculator Debugging Challenge
+    print("Please enter a whole number.")`
+  },
+
+  booking: {
+    info: `
+      <h3>Activity 6: Booking calculator debugging challenge</h3>
+      <p>This program contains several issues. Identify as many as you can, then correct the code.</p>
+      <p><strong>Focus:</strong> type handling, validation, logic errors, output formatting and software quality.</p>
+    `,
+    input: "Alex\n2",
+    tests: `
+      <table>
+        <tr><th>Input</th><th>What to observe</th></tr>
+        <tr><td><code>Alex</code> then <code>2</code></td><td>Does the total calculate correctly?</td></tr>
+        <tr><td>blank name then <code>2</code></td><td>Should a blank customer name be accepted?</td></tr>
+        <tr><td><code>Alex</code> then <code>five</code></td><td>Does the program handle text safely?</td></tr>
+        <tr><td><code>Alex</code> then <code>0</code></td><td>Should zero tickets be accepted?</td></tr>
+        <tr><td><code>Alex</code> then <code>6</code></td><td>Does the discount calculation work?</td></tr>
+      </table>
+    `,
+    code: `# Booking Calculator Debugging Challenge
 
 price = 120
 customer_name = input("Enter customer name: ")
@@ -81,8 +541,26 @@ total = subtotal - discount + vat
 
 print("Customer: " + customer_name)
 print("Tickets: " + tickets)
-print("Total cost: £" + total)`},
-corrected:{info:`<h3>Activity 7: Corrected booking calculator</h3><p>Compare this corrected version with the buggy version. Explain which quality issues have been improved.</p><p><strong>Focus:</strong> validation, reliability, usability, accuracy and maintainability.</p>`,input:"Alex\n6",tests:`<table><tr><th>Input</th><th>What to observe</th></tr><tr><td><code>Alex</code> then <code>6</code></td><td>Expected subtotal £720, discount £72, VAT £144, total £792.</td></tr><tr><td>blank name</td><td>Customer name should not be accepted.</td></tr><tr><td><code>Alex</code> then <code>five</code></td><td>Should display a clear message.</td></tr><tr><td><code>Alex</code> then <code>0</code></td><td>Should not accept zero tickets.</td></tr></table>`,code:`# Corrected Booking Calculator
+print("Total cost: £" + total)`
+  },
+
+  corrected: {
+    info: `
+      <h3>Activity 7: Corrected booking calculator</h3>
+      <p>Compare this corrected version with the buggy version. Explain which quality issues have been improved.</p>
+      <p><strong>Focus:</strong> validation, reliability, usability, accuracy and maintainability.</p>
+    `,
+    input: "Alex\n6",
+    tests: `
+      <table>
+        <tr><th>Input</th><th>What to observe</th></tr>
+        <tr><td><code>Alex</code> then <code>6</code></td><td>Expected subtotal £720, discount £72, VAT £144, total £792.</td></tr>
+        <tr><td>blank name</td><td>Customer name should not be accepted.</td></tr>
+        <tr><td><code>Alex</code> then <code>five</code></td><td>Should display a clear message.</td></tr>
+        <tr><td><code>Alex</code> then <code>0</code></td><td>Should not accept zero tickets.</td></tr>
+      </table>
+    `,
+    code: `# Corrected Booking Calculator
 
 price = 120
 customer_name = input("Enter customer name: ")
@@ -115,15 +593,66 @@ else:
         else:
             print("Number of tickets must be greater than zero.")
     else:
-        print("Please enter a whole number for tickets.")`}
+        print("Please enter a whole number for tickets.")`
+  }
 };
-const activitySelect=document.getElementById("activitySelect"),codeEditor=document.getElementById("codeEditor"),stdinBox=document.getElementById("stdinBox"),output=document.getElementById("output"),activityInfo=document.getElementById("activityInfo"),testInputs=document.getElementById("testInputs"),loader=document.getElementById("loader");let pyodideReady=null;
-function setActivity(key){const a=activities[key];codeEditor.value=a.code;stdinBox.value=a.input;activityInfo.innerHTML=a.info;testInputs.innerHTML=a.tests;output.textContent="Output will appear here."}
-activitySelect.addEventListener("change",()=>setActivity(activitySelect.value));function resetCode(){setActivity(activitySelect.value)}function clearOutput(){output.textContent="Output will appear here."}
-async function copyCode(){await navigator.clipboard.writeText(codeEditor.value);output.textContent="Code copied to clipboard."}
-async function copyEvidence(){const text=buildEvidenceText();await navigator.clipboard.writeText(text);output.textContent="Evidence note copied to clipboard."}
-function downloadEvidence(){const text=buildEvidenceText();const blob=new Blob([text],{type:"text/plain"});const link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="week2_debugging_evidence_note.txt";link.click();URL.revokeObjectURL(link.href)}
-function buildEvidenceText(){const defect=document.getElementById("defectNotes").value.trim();const method=document.getElementById("methodNotes").value.trim();const quality=document.getElementById("qualityNotes").value.trim();return `Week 2 Debugging Evidence Note
+
+const activitySelect = document.getElementById("activitySelect");
+const codeEditor = document.getElementById("codeEditor");
+const stdinBox = document.getElementById("stdinBox");
+const output = document.getElementById("output");
+const activityInfo = document.getElementById("activityInfo");
+const testInputs = document.getElementById("testInputs");
+const loader = document.getElementById("loader");
+
+let pyodideReady = null;
+
+function setActivity(key) {
+  const activity = activities[key];
+  codeEditor.value = activity.code;
+  stdinBox.value = activity.input;
+  activityInfo.innerHTML = activity.info;
+  testInputs.innerHTML = activity.tests;
+  output.textContent = "Output will appear here.";
+}
+
+activitySelect.addEventListener("change", () => setActivity(activitySelect.value));
+
+function resetCode() {
+  setActivity(activitySelect.value);
+}
+
+function clearOutput() {
+  output.textContent = "Output will appear here.";
+}
+
+async function copyCode() {
+  await navigator.clipboard.writeText(codeEditor.value);
+  output.textContent = "Code copied to clipboard.";
+}
+
+async function copyEvidence() {
+  const text = buildEvidenceText();
+  await navigator.clipboard.writeText(text);
+  output.textContent = "Evidence note copied to clipboard.";
+}
+
+function downloadEvidence() {
+  const text = buildEvidenceText();
+  const blob = new Blob([text], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "week2_debugging_evidence_note.txt";
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function buildEvidenceText() {
+  const defect = document.getElementById("defectNotes").value.trim();
+  const method = document.getElementById("methodNotes").value.trim();
+  const quality = document.getElementById("qualityNotes").value.trim();
+
+  return `Week 2 Debugging Evidence Note
 
 Original defect:
 ${defect}
@@ -135,14 +664,19 @@ Correction and quality improvement:
 ${quality}
 
 Suggested write-up:
-The original code produced an unexpected result or error because ${defect||"[explain the defect]"}.
-I identified this by ${method||"[explain the debugging method]"}.
-To correct the issue, I ${quality||"[explain the correction and quality improvement]"}.
-`}
-function transformCodeForInput(code,stdin){const inputs=stdin.split(/\r?\n/);return `
+The original code produced an unexpected result or error because ${defect || "[explain the defect]"}.
+I identified this by ${method || "[explain the debugging method]"}.
+To correct the issue, I ${quality || "[explain the correction and quality improvement]"}.
+`;
+}
+
+function transformCodeForInput(code, stdin) {
+  const inputs = stdin.split(/\r?\n/);
+  return `
 import sys, builtins, traceback
 _input_values = ${JSON.stringify(inputs)}
 _input_index = 0
+
 def input(prompt=""):
     global _input_index
     print(prompt, end="")
@@ -152,17 +686,60 @@ def input(prompt=""):
         print(value)
         return value
     raise EOFError("No more input values were provided.")
+
 ${code}
-`}
-async function loadPyodideRuntime(){if(!pyodideReady){loader.style.display="inline";output.textContent="Loading Python runtime. This may take a moment on first use...";pyodideReady=loadPyodide()}return await pyodideReady}
-async function runPython(){try{const pyodide=await loadPyodideRuntime();loader.style.display="none";const code=transformCodeForInput(codeEditor.value,stdinBox.value);pyodide.runPython(`import sys, io
+`;
+}
+
+async function loadPyodideRuntime() {
+  if (!pyodideReady) {
+    loader.style.display = "inline";
+    output.textContent = "Loading Python runtime. This may take a moment on first use...";
+    pyodideReady = loadPyodide();
+  }
+  return await pyodideReady;
+}
+
+async function runPython() {
+  try {
+    const pyodide = await loadPyodideRuntime();
+    loader.style.display = "none";
+
+    const code = transformCodeForInput(codeEditor.value, stdinBox.value);
+
+    pyodide.runPython(`
+import sys, io
 _stdout = io.StringIO()
 _stderr = io.StringIO()
 sys.stdout = _stdout
-sys.stderr = _stderr`);try{await pyodide.runPythonAsync(code)}catch(err){pyodide.runPython(`import traceback, sys
-traceback.print_exc(file=sys.stderr)`)}const result=pyodide.runPython(`sys.stdout.getvalue() + sys.stderr.getvalue()`);output.textContent=result||"Program ran with no output."}catch(err){loader.style.display="none";output.textContent="Could not run Python in this browser/environment.\n\n"+err}}
+sys.stderr = _stderr
+`);
+
+    try {
+      await pyodide.runPythonAsync(code);
+    } catch (err) {
+      pyodide.runPython(`
+import traceback, sys
+traceback.print_exc(file=sys.stderr)
+`);
+    }
+
+    const result = pyodide.runPython(`
+sys.stdout.getvalue() + sys.stderr.getvalue()
+`);
+
+    output.textContent = result || "Program ran with no output.";
+
+  } catch (err) {
+    loader.style.display = "none";
+    output.textContent = "Could not run Python in this browser/environment.\n\n" + err;
+  }
+}
+
 setActivity("starter");
 </script>
+
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+
 </body>
 </html>
