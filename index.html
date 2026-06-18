@@ -164,6 +164,11 @@ button.danger:hover {
   background: #7f1230;
 }
 
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 pre.output {
   min-height: 180px;
   white-space: pre-wrap;
@@ -285,12 +290,17 @@ th {
     Some Python examples use <code>input()</code>. Because this page runs Python in the browser, you need to type the values for <code>input()</code> into the box labelled <strong>Program input for input() lines</strong>.
   </p>
   <p>
-    Use that box only when the code asks the user for input. If the program asks more than one question, put each answer on a new line.
+    Use that box only when the code asks the user for input. If the program asks more than one question, put each answer on a new line. An empty box counts as a blank response, which is useful when testing whether validation catches missing input.
   </p>
 
   <p><strong>Example:</strong> if the code asks for a customer name and then a number of tickets, enter:</p>
 
   <pre class="example">Alex
+2</pre>
+
+  <p><strong>Example for a blank first response:</strong> if you want to test a blank customer name followed by 2 tickets, leave the first line empty and put <code>2</code> on the second line:</p>
+
+  <pre class="example">
 2</pre>
 </section>
 
@@ -317,7 +327,7 @@ th {
     <h2>2. Code editor</h2>
 
     <div class="button-row">
-      <button onclick="runPython()">Run code <span id="loader" class="loader">loading...</span></button>
+      <button id="runButton" onclick="runPython()">Run code <span id="loader" class="loader">loading...</span></button>
       <button class="secondary" onclick="resetCode()">Reset activity code</button>
       <button class="secondary" onclick="copyCode()">Copy code</button>
       <button class="danger" onclick="clearOutput()">Clear output</button>
@@ -333,7 +343,7 @@ th {
     <textarea id="stdinBox" class="notes" placeholder="Only use this box if the code contains input(). Put each answer on a new line."></textarea>
 
     <p class="small">
-      Leave this box blank if the code does not contain <code>input()</code>.
+      If the code contains <code>input()</code>, this box provides the values used by the program. An empty box is treated as a blank response. If the code does not contain <code>input()</code>, this box is ignored.
     </p>
 
     <h3>Output</h3>
@@ -403,6 +413,8 @@ th {
 </p>
 
 </main>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 
 <script>
 const activities = {
@@ -604,6 +616,7 @@ const output = document.getElementById("output");
 const activityInfo = document.getElementById("activityInfo");
 const testInputs = document.getElementById("testInputs");
 const loader = document.getElementById("loader");
+const runButton = document.getElementById("runButton");
 
 let pyodideReady = null;
 
@@ -677,7 +690,7 @@ import sys, builtins, traceback
 _input_values = ${JSON.stringify(inputs)}
 _input_index = 0
 
-def input(prompt=""):
+def _custom_input(prompt=""):
     global _input_index
     print(prompt, end="")
     if _input_index < len(_input_values):
@@ -685,22 +698,31 @@ def input(prompt=""):
         _input_index += 1
         print(value)
         return value
-    raise EOFError("No more input values were provided.")
+    raise EOFError("No more input values were provided. Add values to the Program input box, one per line.")
+
+builtins.input = _custom_input
+input = _custom_input
 
 ${code}
 `;
 }
 
 async function loadPyodideRuntime() {
+  if (typeof loadPyodide === "undefined") {
+    throw new Error("Pyodide has not loaded. Check the internet connection or whether the page is allowed to load external scripts.");
+  }
+
   if (!pyodideReady) {
     loader.style.display = "inline";
     output.textContent = "Loading Python runtime. This may take a moment on first use...";
     pyodideReady = loadPyodide();
   }
+
   return await pyodideReady;
 }
 
 async function runPython() {
+  runButton.disabled = true;
   try {
     const pyodide = await loadPyodideRuntime();
     loader.style.display = "none";
@@ -733,13 +755,13 @@ sys.stdout.getvalue() + sys.stderr.getvalue()
   } catch (err) {
     loader.style.display = "none";
     output.textContent = "Could not run Python in this browser/environment.\n\n" + err;
+  } finally {
+    runButton.disabled = false;
   }
 }
 
 setActivity("starter");
 </script>
-
-<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 
 </body>
 </html>
